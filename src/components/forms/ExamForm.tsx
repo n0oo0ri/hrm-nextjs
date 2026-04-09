@@ -36,7 +36,7 @@ const ExamForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<ExamSchema>({
-    resolver: zodResolver(examSchema),
+    resolver: zodResolver(examSchema as any),
   });
 
   // AFTER REACT 19 IT'LL BE USEACTIONSTATE
@@ -68,7 +68,7 @@ const ExamForm = ({
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
+      <h1 className="text-2xl font-bold text-gray-800">
         {type === "create" ? "Create a new exam" : "Update the exam"}
       </h1>
 
@@ -107,9 +107,13 @@ const ExamForm = ({
           />
         )}
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Lesson</label>
+          <label className="text-xs font-semibold text-gray-700">Lesson</label>
           <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="px-3 py-2.5 rounded-lg text-sm w-full border-2 transition-colors focus:outline-none"
+            style={{
+              borderColor: '#e0e0e0',
+              backgroundColor: '#f9f9f9'
+            }}
             {...register("lessonId")}
             defaultValue={data?.teachers}
           >
@@ -120,16 +124,19 @@ const ExamForm = ({
             ))}
           </select>
           {errors.lessonId?.message && (
-            <p className="text-xs text-red-400">
+            <p className="text-xs font-medium" style={{ color: '#0066cc' }}>
               {errors.lessonId.message.toString()}
             </p>
           )}
         </div>
       </div>
       {state.error && (
-        <span className="text-red-500">Something went wrong!</span>
+        <span className="text-sm font-semibold" style={{ color: '#0066cc' }}>Something went wrong!</span>
       )}
-      <button className="bg-blue-400 text-white p-2 rounded-md">
+      <button
+        className="text-white p-3 rounded-lg font-semibold transition-all hover:opacity-90 self-start"
+        style={{ backgroundColor: '#0066cc' }}
+      >
         {type === "create" ? "Create" : "Update"}
       </button>
     </form>

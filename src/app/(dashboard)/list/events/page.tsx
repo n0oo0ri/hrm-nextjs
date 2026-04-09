@@ -6,19 +6,22 @@ import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Class, Event, Prisma } from "@prisma/client";
 import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 type EventList = Event & { class: Class };
 
 const EventListPage = async ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
+  // ✅ unwrap the Promise
+  const params = await searchParams;
 
-  const { userId, sessionClaims } = auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
-  const currentUserId = userId;
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  const role = (session?.user as any)?.role;
 
   const columns = [
     {
@@ -91,7 +94,7 @@ const EventListPage = async ({
     </tr>
   );
 
-  const { page, ...queryParams } = searchParams;
+  const { page, ...queryParams } = params;
 
   const p = page ? parseInt(page) : 1;
 
@@ -116,9 +119,9 @@ const EventListPage = async ({
   // ROLE CONDITIONS
 
   const roleConditions = {
-    teacher: { lessons: { some: { teacherId: currentUserId! } } },
-    student: { students: { some: { id: currentUserId! } } },
-    parent: { students: { some: { parentId: currentUserId! } } },
+    teacher: { lessons: { some: { teacherId: userId! } } },
+    student: { students: { some: { id: userId! } } },
+    parent: { students: { some: { parentId: userId! } } },
   };
 
   query.OR = [

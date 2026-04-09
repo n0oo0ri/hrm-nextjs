@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   deleteClass,
   deleteExam,
@@ -59,7 +60,7 @@ const forms: {
     type: "create" | "update",
     data?: any,
     relatedData?: any
-  ) => JSX.Element;
+  ) => React.ReactElement;
 } = {
   subject: (setOpen, type, data, relatedData) => (
     <SubjectForm
@@ -112,12 +113,14 @@ const FormModal = ({
   relatedData,
 }: FormContainerProps & { relatedData?: any }) => {
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
+  
+  // Traveloka color scheme for buttons
   const bgColor =
     type === "create"
-      ? "bg-lamaYellow"
+      ? "bg-yellow-400 hover:bg-yellow-500"
       : type === "update"
-      ? "bg-lamaSky"
-      : "bg-lamaPurple";
+      ? "bg-blue-500 hover:bg-blue-600"
+      : "bg-red-500 hover:bg-red-600";
 
   const [open, setOpen] = useState(false);
 
@@ -140,10 +143,10 @@ const FormModal = ({
     return type === "delete" && id ? (
       <form action={formAction} className="p-4 flex flex-col gap-4">
         <input type="text | number" name="id" value={id} hidden />
-        <span className="text-center font-medium">
+        <span className="text-center font-medium text-gray-800">
           All data will be lost. Are you sure you want to delete this {table}?
         </span>
-        <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center">
+        <button className="text-white py-2 px-4 rounded-lg border-none w-max self-center font-semibold transition-all" style={{ backgroundColor: '#0066cc' }}>
           Delete
         </button>
       </form>
@@ -157,17 +160,17 @@ const FormModal = ({
   return (
     <>
       <button
-        className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
+        className={`${size} flex items-center justify-center rounded-full ${bgColor} transition-all text-white`}
         onClick={() => setOpen(true)}
       >
-        <Image src={`/${type}.png`} alt="" width={16} height={16} />
+        <Image src={`/${type}.png`} alt="" width={16} height={16} style={{ filter: 'brightness(0) invert(1)' }} />
       </button>
       {open && (
         <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-md relative w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
+          <div className="bg-white p-6 rounded-lg relative w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] shadow-xl">
             <Form />
             <div
-              className="absolute top-4 right-4 cursor-pointer"
+              className="absolute top-4 right-4 cursor-pointer hover:opacity-70 transition"
               onClick={() => setOpen(false)}
             >
               <Image src="/close.png" alt="" width={14} height={14} />

@@ -38,7 +38,7 @@ const StudentForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<StudentSchema>({
-    resolver: zodResolver(studentSchema),
+    resolver: zodResolver(studentSchema as any),
   });
 
   const [img, setImg] = useState<any>();
@@ -71,10 +71,10 @@ const StudentForm = ({
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
+      <h1 className="text-2xl font-bold text-gray-800">
         {type === "create" ? "Create a new student" : "Update the student"}
       </h1>
-      <span className="text-xs text-gray-400 font-medium">
+      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider" style={{ color: '#0066cc' }}>
         Authentication Information
       </span>
       <div className="flex justify-between flex-wrap gap-4">
@@ -101,7 +101,7 @@ const StudentForm = ({
           error={errors?.password}
         />
       </div>
-      <span className="text-xs text-gray-400 font-medium">
+      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider" style={{ color: '#0066cc' }}>
         Personal Information
       </span>
       <CldUploadWidget
@@ -185,9 +185,13 @@ const StudentForm = ({
           />
         )}
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
+          <label className="text-xs font-semibold text-gray-700">Sex</label>
           <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="px-3 py-2.5 rounded-lg text-sm w-full border-2 transition-colors focus:outline-none"
+            style={{ 
+              borderColor: '#e0e0e0',
+              backgroundColor: '#f9f9f9'
+            }}
             {...register("sex")}
             defaultValue={data?.sex}
           >
@@ -195,7 +199,7 @@ const StudentForm = ({
             <option value="FEMALE">Female</option>
           </select>
           {errors.sex?.message && (
-            <p className="text-xs text-red-400">
+            <p className="text-xs font-medium" style={{ color: '#0066cc' }}>
               {errors.sex.message.toString()}
             </p>
           )}

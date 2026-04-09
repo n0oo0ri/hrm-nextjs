@@ -6,17 +6,21 @@ import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 type SubjectList = Subject & { teachers: Teacher[] };
 
 const SubjectListPage = async ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
-  const { sessionClaims } = auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  // ✅ unwrap the Promise
+  const params = await searchParams;
+
+  const session = await getServerSession(authOptions);
+  const role = (session?.user as any)?.role;
 
   const columns = [
     {
@@ -56,22 +60,17 @@ const SubjectListPage = async ({
     </tr>
   );
 
-  const { page, ...queryParams } = searchParams;
-
+  const { page, ...queryParams } = params;
   const p = page ? parseInt(page) : 1;
 
   // URL PARAMS CONDITION
-
   const query: Prisma.SubjectWhereInput = {};
-
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
       if (value !== undefined) {
         switch (key) {
           case "search":
             query.name = { contains: value, mode: "insensitive" };
-            break;
-          default:
             break;
         }
       }

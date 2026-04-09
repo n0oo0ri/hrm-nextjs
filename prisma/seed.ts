@@ -1,20 +1,83 @@
 import { Day, PrismaClient, UserSex } from "@prisma/client";
+import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  // CREATE NEXTAUTH USERS
+  const hashedAdminPassword = await bcrypt.hash("admin123", 10);
+  const hashedTeacherPassword = await bcrypt.hash("teacher123", 10);
+  const hashedStudentPassword = await bcrypt.hash("student123", 10);
+  const hashedParentPassword = await bcrypt.hash("parent123", 10);
+
+  // Admin User
+  await prisma.user.upsert({
+    where: { email: "admin@school.com" },
+    update: { password: hashedAdminPassword },
+    create: {
+      email: "admin@school.com",
+      name: "Admin User",
+      password: hashedAdminPassword,
+      role: "admin",
+    },
+  });
+
+  // Teacher User
+  const teacherUser = await prisma.user.upsert({
+    where: { email: "teacher@school.com" },
+    update: { password: hashedTeacherPassword },
+    create: {
+      email: "teacher@school.com",
+      name: "John Teacher",
+      password: hashedTeacherPassword,
+      role: "teacher",
+    },
+  });
+
+  // Student User
+  const studentUser = await prisma.user.upsert({
+    where: { email: "student@school.com" },
+    update: { password: hashedStudentPassword },
+    create: {
+      email: "student@school.com",
+      name: "Jane Student",
+      password: hashedStudentPassword,
+      role: "student",
+    },
+  });
+
+  // Parent User
+  const parentUser = await prisma.user.upsert({
+    where: { email: "parent@school.com" },
+    update: { password: hashedParentPassword },
+    create: {
+      email: "parent@school.com",
+      name: "Bob Parent",
+      password: hashedParentPassword,
+      role: "parent",
+    },
+  });
+
   // ADMIN
-  await prisma.admin.create({
-    data: {
-      id: "admin1",
-      username: "admin1",
-    },
-  });
-  await prisma.admin.create({
-    data: {
-      id: "admin2",
-      username: "admin2",
-    },
-  });
+  try {
+    await prisma.admin.create({
+      data: {
+        id: "admin1",
+        username: "admin1",
+      },
+    });
+  } catch (e) {
+    // Admin already exists
+  }
+  try {
+    await prisma.admin.create({
+      data: {
+        id: "admin2",
+        username: "admin2",
+      },
+    });
+  } catch (e) {
+    // Admin already exists
+  }
 
   // GRADE
   for (let i = 1; i <= 6; i++) {

@@ -28,7 +28,7 @@ const TeacherForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<TeacherSchema>({
-    resolver: zodResolver(teacherSchema),
+    resolver: zodResolver(teacherSchema as any),
   });
 
   const [img, setImg] = useState<any>();
@@ -60,10 +60,10 @@ const TeacherForm = ({
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
+      <h1 className="text-2xl font-bold text-gray-800">
         {type === "create" ? "Create a new teacher" : "Update the teacher"}
       </h1>
-      <span className="text-xs text-gray-400 font-medium">
+      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider" style={{ color: '#0066cc' }}>
         Authentication Information
       </span>
       <div className="flex justify-between flex-wrap gap-4">
@@ -148,9 +148,13 @@ const TeacherForm = ({
           />
         )}
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
+          <label className="text-xs font-semibold text-gray-700">Sex</label>
           <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="px-3 py-2.5 rounded-lg text-sm w-full border-2 transition-colors focus:outline-none"
+            style={{ 
+              borderColor: '#e0e0e0',
+              backgroundColor: '#f9f9f9'
+            }}
             {...register("sex")}
             defaultValue={data?.sex}
           >
@@ -158,16 +162,18 @@ const TeacherForm = ({
             <option value="FEMALE">Female</option>
           </select>
           {errors.sex?.message && (
-            <p className="text-xs text-red-400">
+            <p className="text-xs font-medium" style={{ color: '#0066cc' }}>
               {errors.sex.message.toString()}
             </p>
           )}
-        </div>
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Subjects</label>
+          <label className="font-semibold text-gray-700">Subjects</label>
           <select
             multiple
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="px-3 py-2.5 rounded-lg text-sm w-full border-2 transition-colors focus:outline-none"
+            style={{ 
+              borderColor: '#e0e0e0',
+              backgroundColor: '#f9f9f9'
+            }}
             {...register("subjects")}
             defaultValue={data?.subjects}
           >
@@ -178,7 +184,7 @@ const TeacherForm = ({
             ))}
           </select>
           {errors.subjects?.message && (
-            <p className="text-xs text-red-400">
+            <p className="text-xs font-medium" style={{ color: '#0066cc' }}>
               {errors.subjects.message.toString()}
             </p>
           )}
@@ -204,9 +210,12 @@ const TeacherForm = ({
         </CldUploadWidget>
       </div>
       {state.error && (
-        <span className="text-red-500">Something went wrong!</span>
+        <span className="text-sm font-semibold" style={{ color: '#0066cc' }}>Something went wrong!</span>
       )}
-      <button className="bg-blue-400 text-white p-2 rounded-md">
+      <button 
+        className="text-white p-3 rounded-lg font-semibold transition-all hover:opacity-90 self-start"
+        style={{ backgroundColor: '#0066cc' }}
+      >
         {type === "create" ? "Create" : "Update"}
       </button>
     </form>

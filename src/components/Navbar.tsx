@@ -1,41 +1,55 @@
-import { UserButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import Link from "next/link";
+import { LogoutButton } from "./LogoutButton";
+import { NavMenu } from "./NavMenu";
 import Image from "next/image";
 
 const Navbar = async () => {
-  const user = await currentUser();
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+  const role = (user as any)?.role;
+
+  const navItems = [
+    { label: "Home", href: "/", icons: "/home.png" },
+    { label: "Employees", href: "/tickets/flights", icons: "/airplane.png" },
+    { label: "Attendance", href: "/tickets/buses", icons: "/bus.png" },
+    { label: "Leave", href: "/tickets/trains", icons: "/train.png" },
+    { label: "Payroll", href: "/tickets/hotels", icons: "/bad.png" },
+    { label: "Performace", href: "/tickets/cars", icons: "/car-rental.png" },
+    { label: "Recuitment", href: "/tickets/concerts", icons: "/ticket.png" },
+  ];
+
   return (
-    <div className="flex items-center justify-between p-4">
-      {/* SEARCH BAR */}
-      <div className="hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
-        <Image src="/search.png" alt="" width={14} height={14} />
-        <input
-          type="text"
-          placeholder="Search..."
-          className="w-[200px] p-2 bg-transparent outline-none"
-        />
-      </div>
-      {/* ICONS AND USER */}
-      <div className="flex items-center gap-6 justify-end w-full">
-        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
-          <Image src="/message.png" alt="" width={20} height={20} />
-        </div>
-        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
-          <Image src="/announcement.png" alt="" width={20} height={20} />
-          <div className="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-purple-500 text-white rounded-full text-xs">
-            1
+    <nav className="w-full shadow-md sticky top-0 z-50" style={{ backgroundColor: '#fff' }}>
+      <div className="max-w-full px-6 py-4">
+        {/* TOP SECTION - LOGO AND USER */}
+        <div className="flex items-center justify-between mb-4">
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-3">
+            <Image 
+              src="https://cdn.brandfetch.io/idOaERzIUS/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1771701639861"
+              alt="Sesame Logo"
+              width={120}
+              height={120}
+              priority
+            />
+          </Link>
+
+          {/* USER SECTION - RIGHT */}
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col text-right min-w-[100px]">
+              <span className="text-sm font-semibold" style={{ color: '#0066cc' }}>{user?.name || "User"}</span>
+              <span className="text-xs text-gray-500 capitalize">{role}</span>
+            </div>
+            <LogoutButton />
           </div>
         </div>
-        <div className="flex flex-col">
-          <span className="text-xs leading-3 font-medium">John Doe</span>
-          <span className="text-[10px] text-gray-500 text-right">
-            {user?.publicMetadata?.role as string}
-          </span>
-        </div>
-        {/* <Image src="/avatar.png" alt="" width={36} height={36} className="rounded-full"/> */}
-        <UserButton />
+
+        {/* NAVIGATION MENU - CLIENT COMPONENT */}
+        <NavMenu items={navItems} />
       </div>
-    </div>
+    </nav>
   );
 };
 

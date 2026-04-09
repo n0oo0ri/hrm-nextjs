@@ -6,7 +6,8 @@ import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Assignment, Class, Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 type AssignmentList = Assignment & {
   lesson: {
@@ -19,14 +20,15 @@ type AssignmentList = Assignment & {
 const AssignmentListPage = async ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
+  // ✅ unwrap the Promise
+  const params = await searchParams;
 
-  const { userId, sessionClaims } = auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
-  const currentUserId = userId;
-  
-  
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  const role = (session?.user as any)?.role;
+
   const columns = [
     {
       header: "Subject Name",
@@ -55,13 +57,15 @@ const AssignmentListPage = async ({
         ]
       : []),
   ];
-  
+
   const renderRow = (item: AssignmentList) => (
     <tr
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
-      <td className="flex items-center gap-4 p-4">{item.lesson.subject.name}</td>
+      <td className="flex items-center gap-4 p-4">
+        {item.lesson.subject.name}
+      </td>
       <td>{item.lesson.class.name}</td>
       <td className="hidden md:table-cell">
         {item.lesson.teacher.name + " " + item.lesson.teacher.surname}
@@ -82,7 +86,7 @@ const AssignmentListPage = async ({
     </tr>
   );
 
-  const { page, ...queryParams } = searchParams;
+  const { page, ...queryParams } = params;
 
   const p = page ? parseInt(page) : 1;
 
@@ -120,13 +124,13 @@ const AssignmentListPage = async ({
     case "admin":
       break;
     case "teacher":
-      query.lesson.teacherId = currentUserId!;
+      query.lesson.teacherId = userId!;
       break;
     case "student":
       query.lesson.class = {
         students: {
           some: {
-            id: currentUserId!,
+            id: userId!,
           },
         },
       };
@@ -135,7 +139,7 @@ const AssignmentListPage = async ({
       query.lesson.class = {
         students: {
           some: {
-            parentId: currentUserId!,
+            parentId: userId!,
           },
         },
       };

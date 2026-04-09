@@ -1,33 +1,54 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { withAuth } from "next-auth/middleware";
 import { routeAccessMap } from "./lib/settings";
 import { NextResponse } from "next/server";
 
-const matchers = Object.keys(routeAccessMap).map((route) => ({
-  matcher: createRouteMatcher([route]),
-  allowedRoles: routeAccessMap[route],
-}));
+export default withAuth(
+  function middleware(req) {
+    const path = req.nextUrl.pathname;
+    const token = req.nextauth.token;
 
-console.log(matchers);
-
-export default clerkMiddleware((auth, req) => {
-  // if (isProtectedRoute(req)) auth().protect()
-
-  const { sessionClaims } = auth();
-
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
-
-  for (const { matcher, allowedRoles } of matchers) {
-    if (matcher(req) && !allowedRoles.includes(role!)) {
-      return NextResponse.redirect(new URL(`/${role}`, req.url));
+    // Public routes
+    if (path === "/" || path.startsWith("/sign-in")) {
+      return NextResponse.next();
     }
+
+    // Redirect /continue to the user's role-based route
+    if (path === "/continue") {
+      const role = token?.role as string;
+      if (role) {
+        return NextResponse.redirect(new URL(`/${role}`, req.url));
+      }
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+
+    // Check route access based on user role
+    const userRole = token?.role as string;
+    
+    for (const [route, allowedRoles] of Object.entries(routeAccessMap)) {
+      const routeRegex = new RegExp("^" + route.replace(/\(.*\)/g, "").replace(/\*/g, ".*") + "$");
+      
+      if (routeRegex.test(path)) {
+        if (!userRole || !allowedRoles.includes(userRole)) {
+          return NextResponse.redirect(new URL(userRole ? `/${userRole}` : "/sign-in", req.url));
+        }
+      }
+    }
+
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+    pages: {
+      signIn: "/sign-in",
+    },
   }
-});
+);
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };

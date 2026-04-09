@@ -19,13 +19,27 @@ const TableSearch = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full md:w-auto flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2"
+      className="w-full md:w-auto flex items-center gap-3 rounded-lg px-4 py-2.5 transition-all"
+      style={{ 
+        backgroundColor: '#f5f5f5',
+        border: '1.5px solid #e0e0e0'
+      }}
+      onFocus={(e) => {
+        const form = e.currentTarget;
+        form.style.borderColor = '#0066cc';
+        form.style.backgroundColor = '#fff';
+      }}
+      onBlur={(e) => {
+        const form = e.currentTarget;
+        form.style.borderColor = '#e0e0e0';
+        form.style.backgroundColor = '#f5f5f5';
+      }}
     >
-      <Image src="/search.png" alt="" width={14} height={14} />
+      <Image src="/search.png" alt="" width={16} height={16} style={{ opacity: 0.6 }} />
       <input
         type="text"
         placeholder="Search..."
-        className="w-[200px] p-2 bg-transparent outline-none"
+        className="w-[200px] p-0 bg-transparent outline-none text-sm"
       />
     </form>
   );

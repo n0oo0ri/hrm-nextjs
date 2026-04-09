@@ -15,15 +15,19 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
     router.push(`${window.location.pathname}?${params}`);
   };
   return (
-    <div className="p-4 flex items-center justify-between text-gray-500">
+    <div className="p-4 flex items-center justify-between text-gray-700">
       <button
         disabled={!hasPrev}
-        className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+        className="py-2 px-4 rounded-lg text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all" 
+        style={{ 
+          backgroundColor: hasPrev ? '#0066cc' : '#e0e0e0',
+          color: '#fff'
+        }}
         onClick={() => {
           changePage(page - 1);
         }}
       >
-        Prev
+        ← Prev
       </button>
       <div className="flex items-center gap-2 text-sm">
         {Array.from(
@@ -33,9 +37,12 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
             return (
               <button
                 key={pageIndex}
-                className={`px-2 rounded-sm ${
-                  page === pageIndex ? "bg-lamaSky" : ""
+                className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                  page === pageIndex ? "text-white" : "text-gray-600 hover:text-gray-800"
                 }`}
+                style={{
+                  backgroundColor: page === pageIndex ? '#0066cc' : '#f0f0f0'
+                }}
                 onClick={() => {
                   changePage(pageIndex);
                 }}
@@ -47,13 +54,17 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
         )}
       </div>
       <button
-        className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+        className="py-2 px-4 rounded-lg text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        style={{ 
+          backgroundColor: hasNext ? '#0066cc' : '#e0e0e0',
+          color: '#fff'
+        }}
         disabled={!hasNext}
         onClick={() => {
           changePage(page + 1);
         }}
       >
-        Next
+        Next →
       </button>
     </div>
   );

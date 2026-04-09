@@ -1,108 +1,118 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+/* Traveloka Theme Colors - Blue Theme */
+:root {
+  --color-primary: #0066cc;
+  --color-primary-light: #3385d6;
+  --color-primary-dark: #004c99;
+  --color-secondary: #1e40af;
+  --color-accent: #0099ff;
+  --color-bg: #f5f5f5;
+  --color-border: #e0e0e0;
+}
+
+/* Calendar Styles (React Calendar) */
 .react-calendar {
-  width: 100% !important;
-  border: none !important;
-  font-family: "Inter", sans-serif !important;
+  @apply w-full border-0 font-sans;
 }
 
 .react-calendar__navigation__label__labelText {
-  font-weight: 600;
+  @apply font-semibold;
 }
 
 .react-calendar__tile--active {
-  background-color: #c3ebfa !important;
-  color: black !important;
+  @apply bg-sky-200 text-black; /* Tailwind sky-200 closest to #c3ebfa */
 }
 
+/* React Big Calendar Overrides */
 .rbc-btn-group:first-child {
-  display: none !important;
+  @apply hidden;
 }
 
 .rbc-toolbar-label {
-  text-align: right !important;
-  padding: 0px 20px !important;
+  @apply text-right px-5;
 }
 
 .rbc-btn-group:last-child {
-  font-size: 13px !important;
+  @apply text-sm;
 }
 
 .rbc-btn-group:last-child button {
-  border: none !important;
-  background-color: #f1f0ff !important;
-  margin-left: 2px !important;
+  @apply border-0 bg-gray-100 ml-0.5;
 }
 
 .rbc-toolbar button.rbc-active {
-  background-color: #dbdafe !important;
-  box-shadow: none !important;
+  @apply shadow-none;
+  background-color: var(--color-primary-light);
+}
+
+.rbc-toolbar button:hover {
+  background-color: #f0f0f0;
+  border-color: var(--color-primary);
 }
 
 .rbc-time-view {
-  border-color: #eee !important;
+  @apply border;
+  border-color: var(--color-border);
 }
 
 .rbc-time-header {
-  display: none !important;
+  @apply hidden;
 }
 
 .rbc-time-content {
-  border: none !important;
+  @apply border-0;
 }
 
 .rbc-time-gutter.rbc-time-column {
-  font-size: 12px !important;
+  @apply text-xs;
 }
 
 .rbc-time-gutter.rbc-time-column .rbc-timeslot-group {
-  padding: 0px 20px !important;
+  @apply px-5;
 }
 
 .rbc-timeslot-group {
-  background-color: #f7fdff !important;
+  @apply bg-sky-50; /* closest Tailwind bg to #f7fdff */
 }
 
 .rbc-day-slot {
-  font-size: 14px !important;
-}
-
-.rbc-event {
-  border: none !important;
-  color: black !important;
-  padding: 10px !important;
-  margin: 10px !important;
-  width: 99% !important;
+  @apply text-sm;
 }
 
 .rbc-event:nth-child(1) {
-  background-color: #e2f8ff !important;
+  background-color: var(--color-primary-light);
+  color: white;
 }
 .rbc-event:nth-child(2) {
-  background-color: #fefce8 !important;
+  background-color: var(--color-secondary);
+  color: white;
 }
 .rbc-event:nth-child(3) {
-  background-color: #f2f1ff !important;
+  background-color: var(--color-accent);
+  color: #333;
 }
 .rbc-event:nth-child(4) {
-  background-color: #fdf2fb !important;
+  background-color: var(--color-primary);
+  color: white;
 }
 .rbc-event:nth-child(5) {
-  background-color: #e2f8ff !important;
+  background-color: var(--color-primary-light);
+  color: white;
 }
 .rbc-event:nth-child(6) {
-  background-color: #fefce8 !important;
+  background-color: var(--color-secondary);
+  color: white;
 }
 .rbc-event:nth-child(7) {
-  background-color: #f2f1ff !important;
+  background-color: var(--color-accent);
+  color: #333;
 }
 .rbc-event:nth-child(8) {
-  background-color: #fdf2fb !important;
+  background-color: var(--color-primary);
+  color: white;
 }
 
-.rbc-event-label{
-  color: gray !important;
-  margin-bottom: 5px;
+.rbc-event-label {
+  @apply text-gray-500 mb-1;
 }

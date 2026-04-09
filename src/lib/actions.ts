@@ -9,7 +9,7 @@ import {
   TeacherSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
-import { clerkClient } from "@clerk/nextjs/server";
+import bcrypt from "bcryptjs";
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -142,12 +142,17 @@ export const createTeacher = async (
   data: TeacherSchema
 ) => {
   try {
-    const user = await clerkClient.users.createUser({
-      username: data.username,
-      password: data.password,
-      firstName: data.name,
-      lastName: data.surname,
-      publicMetadata:{role:"teacher"}
+    // Use password if provided, otherwise generate a default one
+    const passwordToHash = data.password && data.password.trim() !== "" ? data.password : "DefaultPassword123";
+    const hashedPassword = await bcrypt.hash(passwordToHash, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        name: `${data.name} ${data.surname}`,
+        password: hashedPassword,
+        role: "teacher",
+      },
     });
 
     await prisma.teacher.create({
@@ -187,11 +192,18 @@ export const updateTeacher = async (
     return { success: false, error: true };
   }
   try {
-    const user = await clerkClient.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
+    const updateData: any = {
+      email: data.email,
+      name: `${data.name} ${data.surname}`,
+    };
+
+    if (data.password && data.password !== "") {
+      updateData.password = await bcrypt.hash(data.password, 10);
+    }
+
+    await prisma.user.update({
+      where: { id: data.id },
+      data: updateData,
     });
 
     await prisma.teacher.update({
@@ -199,7 +211,6 @@ export const updateTeacher = async (
         id: data.id,
       },
       data: {
-        ...(data.password !== "" && { password: data.password }),
         username: data.username,
         name: data.name,
         surname: data.surname,
@@ -231,7 +242,9 @@ export const deleteTeacher = async (
 ) => {
   const id = data.get("id") as string;
   try {
-    await clerkClient.users.deleteUser(id);
+    await prisma.user.delete({
+      where: { id },
+    });
 
     await prisma.teacher.delete({
       where: {
@@ -262,12 +275,17 @@ export const createStudent = async (
       return { success: false, error: true };
     }
 
-    const user = await clerkClient.users.createUser({
-      username: data.username,
-      password: data.password,
-      firstName: data.name,
-      lastName: data.surname,
-      publicMetadata:{role:"student"}
+    // Use password if provided, otherwise generate a default one
+    const passwordToHash = data.password && data.password.trim() !== "" ? data.password : "DefaultPassword123";
+    const hashedPassword = await bcrypt.hash(passwordToHash, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        name: `${data.name} ${data.surname}`,
+        password: hashedPassword,
+        role: "student",
+      },
     });
 
     await prisma.student.create({
@@ -305,11 +323,18 @@ export const updateStudent = async (
     return { success: false, error: true };
   }
   try {
-    const user = await clerkClient.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
+    const updateData: any = {
+      email: data.email,
+      name: `${data.name} ${data.surname}`,
+    };
+
+    if (data.password && data.password !== "") {
+      updateData.password = await bcrypt.hash(data.password, 10);
+    }
+
+    await prisma.user.update({
+      where: { id: data.id },
+      data: updateData,
     });
 
     await prisma.student.update({
@@ -317,7 +342,6 @@ export const updateStudent = async (
         id: data.id,
       },
       data: {
-        ...(data.password !== "" && { password: data.password }),
         username: data.username,
         name: data.name,
         surname: data.surname,
@@ -347,7 +371,9 @@ export const deleteStudent = async (
 ) => {
   const id = data.get("id") as string;
   try {
-    await clerkClient.users.deleteUser(id);
+    await prisma.user.delete({
+      where: { id },
+    });
 
     await prisma.student.delete({
       where: {
